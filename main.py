@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from service import add_room, add_bed, checkin, checkout, overdue, monthly
+from service import add_room, add_bed, checkin, checkout, overdue, monthly, VALID_ROOM_TYPES_LIST
 
 
 def main():
@@ -11,7 +11,7 @@ def main():
     p_room = subparsers.add_parser("add-room", help="添加房间")
     p_room.add_argument("room_id", help="房间编号")
     p_room.add_argument("name", help="房间名称")
-    p_room.add_argument("--type", required=True, dest="room_type", help="房间类型：6人间/8人间/4人间/双人间")
+    p_room.add_argument("--type", required=True, dest="room_type", choices=VALID_ROOM_TYPES_LIST, help="房间类型：6人间/8人间/4人间/双人间")
     p_room.add_argument("--beds", required=True, type=int, help="床位数")
 
     p_bed = subparsers.add_parser("add-bed", help="添加床位")

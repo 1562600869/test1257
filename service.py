@@ -3,13 +3,24 @@ from datetime import date, timedelta
 from storage import load, save
 
 VALID_ROOM_TYPES = {"6人间", "8人间", "4人间", "双人间"}
+VALID_ROOM_TYPES_LIST = sorted(VALID_ROOM_TYPES)
 
 PRICE_PER_NIGHT = 50
 
 
+def _validate_bed_available(bed_id, beds_data):
+    if bed_id not in beds_data:
+        print(f"错误：床位 {bed_id} 不存在")
+        return False
+    if beds_data[bed_id]["status"] != "空闲":
+        print(f"错误：床位 {bed_id} 当前状态为 {beds_data[bed_id]['status']}，无法入住")
+        return False
+    return True
+
+
 def add_room(room_id, name, room_type, beds):
     if room_type not in VALID_ROOM_TYPES:
-        print(f"错误：房间类型只能是 {', '.join(sorted(VALID_ROOM_TYPES))}")
+        print(f"错误：房间类型只能是 {', '.join(VALID_ROOM_TYPES_LIST)}")
         return
     data = load()
     if room_id in data["rooms"]:
@@ -57,11 +68,7 @@ def checkin(bed_id, guest, phone, nights, checkin_date_str):
         return
 
     data = load()
-    if bed_id not in data["beds"]:
-        print(f"错误：床位 {bed_id} 不存在")
-        return
-    if data["beds"][bed_id]["status"] != "空闲":
-        print(f"错误：床位 {bed_id} 当前状态为 {data['beds'][bed_id]['status']}，无法入住")
+    if not _validate_bed_available(bed_id, data["beds"]):
         return
 
     expected_checkout = checkin_date + timedelta(days=nights_int)

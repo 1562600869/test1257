@@ -1,5 +1,6 @@
 import json
 import os
+import tempfile
 
 DATA_PATH = os.path.expanduser("~/.hostel.json")
 
@@ -20,5 +21,15 @@ def load():
 
 
 def save(data):
-    with open(DATA_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    dir_path = os.path.dirname(DATA_PATH) or "."
+    fd, tmp_path = tempfile.mkstemp(dir=dir_path, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        os.replace(tmp_path, DATA_PATH)
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
